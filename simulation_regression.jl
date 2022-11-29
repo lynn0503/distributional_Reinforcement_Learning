@@ -1,6 +1,7 @@
 using Distributions
 using Plots
 using StatsBase
+
 # test Distributions
 # d=Normal()
 # x=rand(d,1000)
@@ -32,6 +33,7 @@ hline!([mean(x)], color=:darkred, linestyle=:dash)
 dblocks = 100
 α₊ = range(start=0.001,stop=0.1,length=dblocks)
 α₋ = range(start=0.1,stop=0.001,length=dblocks)
+
 dvals = fill(0.0,trials,dblocks)
 
 for b in 1:dblocks
@@ -46,6 +48,7 @@ for b in 1:dblocks
         end
     end
 end
+
 # l = @layout [a;b]
 plot(dvals,legend=false)
 convergence = dvals[trials,:]
@@ -57,10 +60,15 @@ plot(x -> cdf_drl(x),0,20, legend=false)
 quantiles=0.1:0.1:1
 values=quantile(convergence,quantiles)
 scatter!(values, quantiles, markersize = 10)
+# asymmetric scaling factor 
+τ = α₊/(α₊+α₋)
+plot(τ,legend=false)
+println(τ)
+
 # converge to expectile
-dblocks = 100
-α₊ = range(start=0.001,stop=0.1,length=dblocks)
-α₋ = range(start=0.1,stop=0.001,length=dblocks)
+# dblocks = 100
+# α₊ = range(start=0.001,stop=0.1,length=dblocks)
+# α₋ = range(start=0.1,stop=0.001,length=dblocks)
 evals = fill(0.0,trials,dblocks)
 
 for b in 1:dblocks
@@ -74,6 +82,7 @@ for b in 1:dblocks
         end
     end
 end
+
 plot(evals,legend=false)
 
 econvergence = evals[trials,:]
