@@ -8,18 +8,67 @@ using Plots
 
 # bimodal gaussian distribution
 bimodal=MixtureModel(Normal[Normal(5, 1),Normal(15, 1)], [0.3, 0.7])
-x=rand(bimodal,1000)
-histogram(x;bins=0:0.5:20)
+x=rand(bimodal,2000)
+histogram(x;bins=0:0.5:20,legend=false)
 mean(x)
-# simulate traditional RL
-α = 0.1
+# set parameters
+blocks =10
 trials = 2000
-vals = fill(0,trials)
-for t in 2:trials
-    δ = reward - val[t-1]
-    vals[t] = val[t-1] + α * δ
+# simulate traditional RL
+# converge to mean 
+α = 0.01:0.01:0.1
+vals = fill(0.0,trials,blocks)
+for b in 1:blocks
+    for t in 2:(trials-1)
+        δ = x[t-1] - vals[t-1,b]
+        vals[t,b] = vals[t-1,b] + α[b] * δ
+    end
 end
-
-plot(vals)
+plot(vals,legend=false)
+hline!([mean(x)], color=:darkred, linestyle=:dash)
 
 # simulate distributional RL
+# converge to quantile
+dblocks = 500
+α₊ = range(start=0.001,stop=0.5,length=dblocks)
+α₋ = range(start=0.5,stop=0.001,length=dblocks)
+dvals = fill(0.0,trials,dblocks)
+
+for b in 1:dblocks
+    for t in 2:trials
+        # println(x[t-1] - dvals[t-1,b])
+        if x[t-1] - dvals[t-1,b] > 0
+            δ = 1
+            dvals[t,b] = dvals[t-1,b] + α₊[b] * δ
+        else
+            δ = -1
+            dvals[t,b] = dvals[t-1,b] + α₋[b] * δ
+        end
+    end
+end
+plot(dvals)
+
+convergence = dvals[trials,:]
+histogram(convergence,bins=0:0.5:20)
+
+# converge to expectile
+dblocks = 500
+α₊ = range(start=0.001,stop=0.5,length=dblocks)
+α₋ = range(start=0.05,stop=0.001,length=dblocks)
+evals = fill(0.0,trials,dblocks)
+
+for b in 1:dblocks
+    for t in 2:trials
+        δ = x[t-1] - evals[t-1,b]
+        # println(δ)
+        if  δ > 0
+            evals[t,b] = evals[t-1,b] + α₊[b] * δ
+        else
+            evals[t,b] = evals[t-1,b] + α₋[b] * δ
+        end
+    end
+end
+plot(evals)
+
+econvergence = evals[trials,:]
+histogram(econvergence,bins=0:0.5:20)
