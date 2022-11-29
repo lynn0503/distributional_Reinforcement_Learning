@@ -29,9 +29,9 @@ hline!([mean(x)], color=:darkred, linestyle=:dash)
 
 # simulate distributional RL
 # converge to quantile
-dblocks = 500
-α₊ = range(start=0.001,stop=0.5,length=dblocks)
-α₋ = range(start=0.5,stop=0.001,length=dblocks)
+dblocks = 100
+α₊ = range(start=0.001,stop=0.1,length=dblocks)
+α₋ = range(start=0.1,stop=0.001,length=dblocks)
 dvals = fill(0.0,trials,dblocks)
 
 for b in 1:dblocks
@@ -46,15 +46,16 @@ for b in 1:dblocks
         end
     end
 end
-plot(dvals)
-
+# l = @layout [a;b]
+plot(dvals,legend=false)
 convergence = dvals[trials,:]
-histogram(convergence,bins=0:0.5:20)
+histogram(convergence,bins=0:0.5:20,legend=false)
+# plot(a,b,layout=l)
 
 # converge to expectile
-dblocks = 500
-α₊ = range(start=0.001,stop=0.5,length=dblocks)
-α₋ = range(start=0.05,stop=0.001,length=dblocks)
+dblocks = 100
+α₊ = range(start=0.001,stop=0.1,length=dblocks)
+α₋ = range(start=0.1,stop=0.001,length=dblocks)
 evals = fill(0.0,trials,dblocks)
 
 for b in 1:dblocks
@@ -68,7 +69,7 @@ for b in 1:dblocks
         end
     end
 end
-plot(evals)
+plot(evals,legend=false)
 
 econvergence = evals[trials,:]
 histogram(econvergence,bins=0:0.5:20)
