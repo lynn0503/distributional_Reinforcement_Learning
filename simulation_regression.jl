@@ -1,6 +1,6 @@
 using Distributions
 using Plots
-
+using StatsBase
 # test Distributions
 # d=Normal()
 # x=rand(d,1000)
@@ -51,7 +51,12 @@ plot(dvals,legend=false)
 convergence = dvals[trials,:]
 histogram(convergence,bins=0:0.5:20,legend=false)
 # plot(a,b,layout=l)
-
+# plot cumulative distribution function
+cdf_drl = ecdf(convergence)
+plot(x -> cdf_drl(x),0,20, legend=false)
+quantiles=0.1:0.1:1
+values=quantile(convergence,quantiles)
+scatter!(values, quantiles, markersize = 10)
 # converge to expectile
 dblocks = 100
 α₊ = range(start=0.001,stop=0.1,length=dblocks)
