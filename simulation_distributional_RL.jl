@@ -10,7 +10,7 @@ using StatsBase
 # bimodal gaussian distribution
 bimodal=MixtureModel(Normal[Normal(5, 1),Normal(15, 1)], [0.3, 0.7])
 x=rand(bimodal,2000)
-histogram(x;bins=0:0.5:20,legend=false)
+histogram(x;bins=0:0.5:20,legend=false,normalize=true)
 mean(x)
 # set parameters
 blocks =10
@@ -20,7 +20,7 @@ trials = 2000
 α = 0.01:0.01:0.1
 vals = fill(0.0,trials,blocks)
 for b in 1:blocks
-    for t in 2:(trials-1)
+    for t in 2:trials
         δ = x[t-1] - vals[t-1,b]
         vals[t,b] = vals[t-1,b] + α[b] * δ
     end
@@ -86,4 +86,4 @@ end
 plot(evals,legend=false)
 
 econvergence = evals[trials,:]
-histogram(econvergence,bins=0:0.5:20)
+histogram(econvergence,bins=0:0.5:20,legend=false,normalize=true)
