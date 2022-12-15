@@ -63,7 +63,7 @@ scatter!(values, quantiles, markersize = 10)
 # asymmetric scaling factor 
 τ = α₊/(α₊+α₋)
 plot(τ,legend=false)
-println(τ)
+# println(τ)
 
 # converge to expectile
 # dblocks = 100
