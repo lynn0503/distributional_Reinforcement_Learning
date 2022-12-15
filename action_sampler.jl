@@ -24,11 +24,17 @@ function thompson(dist)
 
 end
 # UCB
-function ucb(dist,β)
+function ucb(dist,β,ϵ)
     avgs=mean(dist,dims=1)
     stds=std(dist,dims=1)
     ucbs=avgs + β * stds
-    car_idx=argmax(ucbs)
-    idx=getindex(car_idx,2)
+    tmp=rand()
+    if tmp>ϵ
+        car_idx=argmax(ucbs)
+        idx=getindex(car_idx,2)
+    else
+        idx=rand(1:n)
+    end
+    
     return idx
 end
