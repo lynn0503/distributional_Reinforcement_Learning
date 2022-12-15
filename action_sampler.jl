@@ -1,5 +1,6 @@
 using Statistics
 # argmax
+
 # ϵ-greedy
 function ϵ_greedy(dist,n,ϵ)
     avgs=mean(dist,dims=1)
@@ -15,14 +16,25 @@ function ϵ_greedy(dist,n,ϵ)
     return idx
 end
 # softmax
-function softmax(dist)
-    avgs=mean(dist)
-
+function sftmax(dist,β)
+    avgs=mean(dist,dims=1)
+    soft_prob=exp.(β.*avgs)./sum(exp.(β.*avgs))
+    idx=sum(cumsum(soft_prob,dims=2).<rand())+1
+    return idx
 end
+# test softmax
+# idx_cnt=zeros(3)
+# for i in 1:1000
+#     idx=sum(cumsum([0.3,0.5,0.2]).<rand())+1
+#     idx_cnt[idx]+=1
+# end
+# bar(idx_cnt)
+
 # Thompson sampling
 function thompson(dist)
 
 end
+
 # UCB
 function ucb(dist,β,ϵ)
     avgs=mean(dist,dims=1)
