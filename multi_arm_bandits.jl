@@ -74,8 +74,8 @@ for t in 1:trials-1
     values_trial_t=hcat(values[1,:,trial_arm_1],values[2,:,trial_arm_2])
     # println(size(values_trial_t))
     # size 100*3
-    # new_choice=ϵ_greedy(values_trial_t,n,0.2)
-    new_choice=ucb(values_trial_t,0.2)
+    # new_choice=ϵ_greedy(values_trial_t,n,0.1)
+    new_choice=ucb(values_trial_t,0.1,0.1)
     # println(new_choice)
     choices[t+1]=new_choice
     choices_cnt[new_choice]+=1
@@ -93,6 +93,7 @@ histogram!(convergence,normalize=true,alpha=0.3)
 # histogram(rewards[:,2],normalize=true,alpha=0.3)
 # histogram!(convergence[:,2],normalize=true,alpha=0.3)
 # plot(cumsum(reward_agent))
-histogram(choices)
-println("first choice is :",choices[1])
-println("freqency of first choice is:", sum(choices.==choices[1])/trials)
+plot(reward_agent)
+# histogram(choices)
+# println("first choice is :",choices[1])
+# println("freqency of first choice is:", sum(choices.==choices[1])/trials)
