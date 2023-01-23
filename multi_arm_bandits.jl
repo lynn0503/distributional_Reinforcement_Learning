@@ -71,12 +71,13 @@ for t in 1:trials-1
     #     trial_arm_3=1
     # end
     # values_trial_t=hcat(values[1,:,trial_arm_1],values[2,:,trial_arm_2],values[3,:,trial_arm_3])
-    values_trial_t=hcat(values[1,:,trial_arm_1],values[2,:,trial_arm_2])
+    global values_trial_t=hcat(values[1,:,trial_arm_1],values[2,:,trial_arm_2])
     # println(size(values_trial_t))
     # size 100*3
     # new_choice=ϵ_greedy(values_trial_t,n,0.1)
     # new_choice=sftmax(values_trial_t,0.1)
-    new_choice=ucb(values_trial_t,choices_cnt,t,0.1)
+    # new_choice=ucb(values_trial_t,choices_cnt,t,0.1)
+    new_choice=thompson(values_trial_t)
     # println(new_choice)
     choices[t+1]=new_choice
     choices_cnt[new_choice]+=1
