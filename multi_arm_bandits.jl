@@ -30,7 +30,7 @@ values[2,:,1]=ones(population)*10*rand()
 choices=zeros(Int,trials)
 choices[1]=rand(1:n)
 # simulation
-choices_cnt=zeros(Int,3)
+choices_cnt=zeros(Int,2)
 choices_cnt[choices[1]]+=1
 for t in 1:trials-1
     # reward to agent
@@ -75,8 +75,8 @@ for t in 1:trials-1
     # println(size(values_trial_t))
     # size 100*3
     # new_choice=ϵ_greedy(values_trial_t,n,0.1)
-    new_choice=sftmax(values_trial_t,0.1)
-    # new_choice=ucb(values_trial_t,0.1,0.1)
+    # new_choice=sftmax(values_trial_t,0.1)
+    new_choice=ucb(values_trial_t,choices_cnt,t,0.1)
     # println(new_choice)
     choices[t+1]=new_choice
     choices_cnt[new_choice]+=1
