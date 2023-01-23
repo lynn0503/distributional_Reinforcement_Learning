@@ -1,4 +1,5 @@
 using Statistics
+using Distributions
 # argmax
 
 # ϵ-greedy
@@ -31,22 +32,24 @@ end
 # bar(idx_cnt)
 
 # Thompson sampling
-function thompson(dist)
-
+function thompson(a,b)
+    # a is how many times to get reward 1 for each arm
+    # b is how many times to get reward 0 for each arm
+    distribution_for_each_arm=Beta(a,b)
+    sample_for_each_arm=rand(distribution_for_each_arm)
+    car_idx=argmax(sample_for_each_arm)
+    idx=getindex(car_idx,2)
+    return idx
 end
 
 # UCB
-function ucb(dist,β,ϵ)
+function ucb(dist,choices_cnt,t,β)
     avgs=mean(dist,dims=1)
-    stds=std(dist,dims=1)
-    ucbs=avgs + β * stds
-    tmp=rand()
-    if tmp>ϵ
-        car_idx=argmax(ucbs)
-        idx=getindex(car_idx,2)
-    else
-        idx=rand(1:n)
-    end
-    
+    # uncertainty=sqrt(-log(p)/2count(action))
+    # here let p=1/t
+    uncertainty=.√(log(t)/2*(choices_cnt.+1))
+    ucbs=transpose(avgs) + β * uncertainty
+    car_idx=argmax(ucbs)
+    idx=getindex(car_idx,2)
     return idx
 end
