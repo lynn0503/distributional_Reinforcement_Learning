@@ -32,13 +32,15 @@ end
 # bar(idx_cnt)
 
 # Thompson sampling
-function thompson(a,b)
-    # a is how many times to get reward 1 for each arm
-    # b is how many times to get reward 0 for each arm
-    distribution_for_each_arm=Beta(a,b)
-    sample_for_each_arm=rand(distribution_for_each_arm)
-    car_idx=argmax(sample_for_each_arm)
-    idx=getindex(car_idx,2)
+function thompson(values_trial_t)
+    # for distributional RL no need to infer reward distribution
+    # because neuronal population encode this distribution
+    # generate one sample for one arm from this distribution
+    samples_idx=rand(1:100,2)
+    # println(samples_idx)
+    samples=values_trial_t[samples_idx,[1,2]]
+    cart_idx=argmax(samples)
+    idx=getindex(cart_idx,2)
     return idx
 end
 
@@ -49,7 +51,7 @@ function ucb(dist,choices_cnt,t,β)
     # here let p=1/t
     uncertainty=.√(log(t)/2*(choices_cnt.+1))
     ucbs=transpose(avgs) + β * uncertainty
-    car_idx=argmax(ucbs)
-    idx=getindex(car_idx,2)
+    cart_idx=argmax(ucbs)
+    idx=getindex(cart_idx,2)
     return idx
 end
