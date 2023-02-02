@@ -14,35 +14,50 @@ function ϵ_greedy(vals,ϵ)
     return idx
 end
 
-function naive_bonus(dist,c)
-    avgs=mean(dist,dims=1)
-    stds=std(dist,dims=1)
-    tmp=avgs+c.*stds
-    car_idx=argmax(tmp)
-    idx=getindex(car_idx,2)
+function naive_bonus(dist,c,ϵ)
+    tmp=rand()
+    if tmp>ϵ
+        avgs=mean(dist,dims=1)
+        stds=std(dist,dims=1)
+        tmp=avgs+c.*stds
+        car_idx=argmax(tmp)
+        idx=getindex(car_idx,2)
+    else 
+        idx=rand(1:10)
+    end
     return idx
 end
 
-function vanish_bonus(dist,c,t)
-    avgs=mean(dist,dims=1)
-    stds=std(dist,dims=1)
-    ct=c*sqrt(log(t)/t)
-    tmp=avgs+ct.*stds
-    car_idx=argmax(tmp)
-    idx=getindex(car_idx,2)
+function vanish_bonus(dist,c,t,ϵ)
+    tmp=rand()
+    if tmp>ϵ
+        avgs=mean(dist,dims=1)
+        stds=std(dist,dims=1)
+        ct=c*sqrt(log(t)/t)
+        tmp=avgs+ct.*stds
+        car_idx=argmax(tmp)
+        idx=getindex(car_idx,2)
+    else 
+        idx=rand(1:10)
+    end
     return idx
 end
 
-function truncated_variance(dist,c,t)
-    N=size(dist,1)
-    sort!(dist,dims=1)
-    avgs=mean(dist,dims=1)
-    mid=floor(Int,N/2)
-    stds_left=std(dist[mid:N,:])
-    ct=c*sqrt(log(t)/t)
-    tmp=avgs.+ct*stds_left
-    car_idx=argmax(tmp)
-    idx=getindex(car_idx,2)
+function truncated_variance(dist,c,t,ϵ)
+    tmp=rand()
+    if tmp>ϵ
+        N=size(dist,1)
+        sort!(dist,dims=1)
+        avgs=mean(dist,dims=1)
+        mid=floor(Int,N/2)
+        stds_left=std(dist[mid:N,:])
+        ct=c*sqrt(log(t)/t)
+        tmp=avgs.+ct*stds_left
+        car_idx=argmax(tmp)
+        idx=getindex(car_idx,2)
+    else
+        idx=rand(1:10)
+    end
     return idx
 end
 # softmax
