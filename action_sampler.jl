@@ -3,17 +3,46 @@ using Distributions
 # argmax
 
 # ϵ-greedy
-function ϵ_greedy(dist,n,ϵ)
-    avgs=mean(dist,dims=1)
-    # println(avgs)
+function ϵ_greedy(vals,ϵ)
+    K=size(vals,2)
     tmp=rand()
     if tmp>ϵ
-        car_idx=argmax(avgs)
-        idx=getindex(car_idx,2)
-        # println(idx)
+        idx=argmax(vals)
     else
-        idx=rand(1:n)
+        idx=rand(1:K)
     end
+    return idx
+end
+
+function naive_bonus(dist,c)
+    avgs=mean(dist,dims=1)
+    stds=std(dist,dims=1)
+    tmp=avgs+c.*stds
+    car_idx=argmax(tmp)
+    idx=getindex(car_idx,2)
+    return idx
+end
+
+function vanish_bonus(dist,c,t)
+    avgs=mean(dist,dims=1)
+    stds=std(dist,dims=1)
+    ct=c*sqrt(log(t)/t)
+    tmp=avgs+ct.*stds
+    car_idx=argmax(tmp)
+    idx=getindex(car_idx,2)
+    return idx
+end
+
+function truncated_variance(dist,c,t)
+    N=size(dist,1)
+    sort!(dist,dims=1)
+    avgs=mean(dist,dims=1)
+    mid=floor(Int,N/2)
+    stds_left=std(dist[mid:N,:])
+    ct=c*sqrt(log(t)/t)
+    tmp=avgs.+ct*stds_left
+    car_idx=argmax(tmp)
+    idx=getindex(car_idx,2)
     return idx
 end
 # softmax
@@ -55,3 +84,4 @@ function ucb(dist,choices_cnt,t,β)
     idx=getindex(cart_idx,2)
     return idx
 end
+
