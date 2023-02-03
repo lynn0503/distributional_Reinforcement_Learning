@@ -3,8 +3,7 @@ using Distributions
 # argmax
 
 # ϵ-greedy
-function ϵ_greedy(vals,ϵ)
-    K=size(vals,2)
+function ϵ_greedy(vals,ϵ,K)
     tmp=rand()
     if tmp>ϵ
         idx=argmax(vals)
@@ -14,49 +13,60 @@ function ϵ_greedy(vals,ϵ)
     return idx
 end
 
-function naive_bonus(dist,c,ϵ)
+function decay_ϵ_greedy(vals,ϵ,t,K)
+    ϵ=ϵ/t
     tmp=rand()
     if tmp>ϵ
-        avgs=mean(dist,dims=1)
-        stds=std(dist,dims=1)
-        tmp=avgs+c.*stds
-        car_idx=argmax(tmp)
-        idx=getindex(car_idx,2)
-    else 
-        idx=rand(1:10)
+        idx=argmax(vals)
+    else
+        idx=rand(1:K)
     end
     return idx
 end
 
-function vanish_bonus(dist,c,t,ϵ)
+function naive_bonus(dist,c,ϵ,K)
+    tmp=rand()
+    if tmp>ϵ
+        avgs=mean(dist,dims=1)
+        stds=std(dist,dims=1)
+        vals=avgs+c.*stds
+        car_idx=argmax(vals)
+        idx=getindex(car_idx,2)
+    else 
+        idx=rand(1:K)
+    end
+    return idx
+end
+
+function vanish_bonus(dist,c,t,ϵ,K)
     tmp=rand()
     if tmp>ϵ
         avgs=mean(dist,dims=1)
         stds=std(dist,dims=1)
         ct=c*sqrt(log(t)/t)
-        tmp=avgs+ct.*stds
-        car_idx=argmax(tmp)
+        vals=avgs+ct.*stds
+        car_idx=argmax(vals)
         idx=getindex(car_idx,2)
     else 
-        idx=rand(1:10)
+        idx=rand(1:K)
     end
     return idx
 end
 
-function truncated_variance(dist,c,t,ϵ)
+function truncated_variance(dist,c,t,ϵ,K)
+    N=size(dist,1)
     tmp=rand()
     if tmp>ϵ
-        N=size(dist,1)
         sort!(dist,dims=1)
         avgs=mean(dist,dims=1)
         mid=floor(Int,N/2)
         stds_left=std(dist[mid:N,:])
         ct=c*sqrt(log(t)/t)
-        tmp=avgs.+ct*stds_left
-        car_idx=argmax(tmp)
+        vals=avgs.+ct*stds_left
+        car_idx=argmax(vals)
         idx=getindex(car_idx,2)
     else
-        idx=rand(1:10)
+        idx=rand(1:K)
     end
     return idx
 end
