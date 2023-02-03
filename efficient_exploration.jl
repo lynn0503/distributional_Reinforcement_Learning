@@ -13,12 +13,13 @@ N=50
 c=10
 α=0.01
 ϵ=0.05
-trials=1000
+trials=500
 runs=1000
+shape=4
 # environment setup
 # avg_distribution=Normal(0,1)
 # avg_K=rand(avg_distribution,K)
-avg_K=randn(K)
+avg_K=randn(K)*10
 best_arm=argmax(avg_K)
 std_K=ones(K)*5
 std_K[best_arm]=1
@@ -32,6 +33,14 @@ function step(avg_K,std_K,action)
     return reward,regret
 end
 
+function step_asym(avg_K,std_K,action,shape)
+    global best_arm
+    reward_dist=SkewNormal(avg_K[action],std_K[action],shape)
+    reward=rand(reward_dist)
+    reward_max=rand(SkewNormal(avg_K[best_arm],std_K[best_arm],shape))
+    regret=reward_max-reward
+    return reward,regret
+end
 # traditional
 function value_estimate(action,reward,value,α)
     δ=reward-value[action]
@@ -82,22 +91,27 @@ for r in 1:runs
     for t in 1:trials
         action0=ϵ_greedy(value,ϵ,K)
         rewards_traditional[t,r],regret_traditional[t,r]=step(avg_K,std_K,action0)
+        # rewards_traditional[t,r],regret_traditional[t,r]=step_asym(avg_K,std_K,action0,shape)
         value=value_estimate(action0,rewards_traditional[t,r],value,α)
 
         action0d=decay_ϵ_greedy(value0d,ϵ,t,K)
         rewards_traditional_decay[t,r],regret_traditional_decay[t,r]=step(avg_K,std_K,action0d)
+        # rewards_traditional_decay[t,r],regret_traditional_decay[t,r]=step_asym(avg_K,std_K,action0d,shape)
         value0d=value_estimate(action0d,rewards_traditional_decay[t,r],value0d,α)
 
         action1=naive_bonus(dist1,c,ϵ,K)
         rewards_naive_bonus[t,r],regret_naive_bonus[t,r]=step(avg_K,std_K,action1)
+        # rewards_naive_bonus[t,r],regret_naive_bonus[t,r]=step_asym(avg_K,std_K,action1,shape)
         dist1=distribution_estimate(action1,rewards_naive_bonus[t,r],dist1,α₊,α₋)
 
         action2=vanish_bonus(dist2,c,t,ϵ,K)
         rewards_vanish_bonus[t,r],regret_vanish_bonus[t,r]=step(avg_K,std_K,action2)
+        # rewards_vanish_bonus[t,r],regret_vanish_bonus[t,r]=step_asym(avg_K,std_K,action2,shape)
         dist2=distribution_estimate(action2,rewards_vanish_bonus[t,r],dist2,α₊,α₋)
 
         action3=truncated_variance(dist3,c,t,ϵ,K)
         rewards_truncated_variance[t,r],regret_truncated_variance[t,r]=step(avg_K,std_K,action3)
+        # rewards_truncated_variance[t,r],regret_truncated_variance[t,r]=step_asym(avg_K,std_K,action3,shape)
         dist3=distribution_estimate(action3,rewards_truncated_variance[t,r],dist3,α₊,α₋)
     end
 end
@@ -128,13 +142,14 @@ regret1=mean(cumsum(regret_naive_bonus,dims=1),dims=2)
 regret2=mean(cumsum(regret_vanish_bonus,dims=1),dims=2)
 regret3=mean(cumsum(regret_truncated_variance,dims=1),dims=2)
 
-p2=plot(regret0,label="ϵ greedy",legend=:topleft,xlabel="trials",ylabel="average regret",size=(width,height))
+p2=plot(regret0,label="ϵ greedy",legend=:topleft,xlabel="trials",ylabel="cumulative regret",size=(width,height))
 plot!(regret0d,label="decay ϵ greedy")
 plot!(regret1,label="naive bonus")
 plot!(regret2,label="vanish bonus")
 plot!(regret3,label="truncated variance")
 
 plot(p1,p2,layout=l)
+
 # bar(avg_K,alpha=0.5)
 # bar!(value,alpha=0.5)
 # bar!(value0d,alpha=0.5)
